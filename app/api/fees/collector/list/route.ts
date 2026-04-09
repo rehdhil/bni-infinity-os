@@ -1,7 +1,12 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import { verifyCollectorPin } from '@/lib/fees/collector-auth'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!verifyCollectorPin(req)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const supabase = createServiceClient()
   const now = new Date()
   const month = now.getMonth() + 1

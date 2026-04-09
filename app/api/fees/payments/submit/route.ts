@@ -19,12 +19,37 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Amount and valid method required' }, { status: 400 })
   }
 
+  if (![2500, 14500].includes(amount)) {
+    return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
+  }
+
   if ((method === 'UPI' || method === 'CC') && !proofFile) {
     return NextResponse.json({ error: 'Proof required for UPI/CC payments' }, { status: 400 })
   }
 
+  if (proofFile) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+    if (!allowedTypes.includes(proofFile.type)) {
+      return NextResponse.json({ error: 'Invalid file type. Use JPEG, PNG, WebP, or PDF.' }, { status: 400 })
+    }
+  }
+
   const supabase = createServiceClient()
   const now = new Date()
+
+  const { data: existing } = await supabase
+    .from('payments')
+    .select('id')
+    .eq('member_id', session.memberId)
+    .eq('period_month', now.getMonth() + 1)
+    .eq('period_year', now.getFullYear())
+    .limit(1)
+    .single()
+
+  if (existing) {
+    return NextResponse.json({ error: 'Payment already submitted for this month' }, { status: 409 })
+  }
+
   let proofUrl: string | null = null
 
   if (proofFile) {

@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import { verifyCollectorPin } from '@/lib/fees/collector-auth'
 
 export async function POST(req: NextRequest) {
+  if (!verifyCollectorPin(req)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   let body: { type?: unknown; name?: unknown; phone?: unknown; amount?: unknown; invitedBy?: unknown; category?: unknown }
   try { body = await req.json() } catch { return NextResponse.json({ error: 'Invalid body' }, { status: 400 }) }
 
@@ -9,6 +14,10 @@ export async function POST(req: NextRequest) {
 
   if (typeof name !== 'string' || typeof amount !== 'number' || typeof type !== 'string') {
     return NextResponse.json({ error: 'name, amount and type required' }, { status: 400 })
+  }
+
+  if (amount < 1 || amount > 50000) {
+    return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
   }
 
   const supabase = createServiceClient()

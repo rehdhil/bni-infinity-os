@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-export default function WalkInModal({ onClose }: { onClose: () => void }) {
+export default function WalkInModal({ onClose, pin }: { onClose: () => void; pin: string }) {
   const [type, setType] = useState<'new_member' | 'visitor'>('visitor')
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
@@ -9,16 +9,23 @@ export default function WalkInModal({ onClose }: { onClose: () => void }) {
   const [category, setCategory] = useState('')
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
+  const [error, setError] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
-    await fetch('/api/fees/collector/walkin', {
+    setError('')
+    const res = await fetch('/api/fees/collector/walkin', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-collector-pin': pin },
       body: JSON.stringify({ type, name, phone, amount: parseInt(amount), category }),
     })
+    const data = await res.json()
     setLoading(false)
+    if (!res.ok) {
+      setError(data.error || 'Failed to record')
+      return
+    }
     setDone(true)
     setTimeout(onClose, 1500)
   }
@@ -60,6 +67,8 @@ export default function WalkInModal({ onClose }: { onClose: () => void }) {
                 placeholder="Business category"
                 className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none" />
             )}
+
+            {error && <p className="text-red-400 text-sm">{error}</p>}
 
             <div className="flex gap-2">
               <button type="button" onClick={onClose}

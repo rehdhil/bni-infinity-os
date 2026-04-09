@@ -2,17 +2,20 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-const COLLECTOR_PIN = process.env.NEXT_PUBLIC_COLLECTOR_PIN ?? '1234'
-
 export default function CollectorPINPage() {
   const [pin, setPin] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (pin === COLLECTOR_PIN) {
+    // Verify PIN server-side by probing the list endpoint
+    const res = await fetch('/api/fees/collector/list', {
+      headers: { 'x-collector-pin': pin },
+    })
+    if (res.ok) {
       sessionStorage.setItem('collector_auth', 'true')
+      sessionStorage.setItem('collector_pin', pin)
       router.push('/fees/collector/list')
     } else {
       setError('Incorrect PIN')

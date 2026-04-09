@@ -16,14 +16,19 @@ export default function CollectorList() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [marked, setMarked] = useState<Set<string>>(new Set())
+  const [pin, setPin] = useState('')
   const router = useRouter()
 
   useEffect(() => {
-    if (sessionStorage.getItem('collector_auth') !== 'true') {
+    const storedPin = sessionStorage.getItem('collector_pin') || ''
+    if (sessionStorage.getItem('collector_auth') !== 'true' || !storedPin) {
       router.push('/fees/collector')
       return
     }
-    fetch('/api/fees/collector/list')
+    setPin(storedPin)
+    fetch('/api/fees/collector/list', {
+      headers: { 'x-collector-pin': storedPin },
+    })
       .then(r => r.json())
       .then(setMembers)
       .finally(() => setLoading(false))
@@ -32,7 +37,7 @@ export default function CollectorList() {
   async function handleMark(memberId: string, action: 'paid' | 'no_show') {
     await fetch('/api/fees/collector/mark', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-collector-pin': pin },
       body: JSON.stringify({ memberId, action }),
     })
     setMarked(prev => new Set([...prev, memberId]))
@@ -85,7 +90,7 @@ export default function CollectorList() {
         </div>
       ))}
 
-      {showModal && <WalkInModal onClose={() => setShowModal(false)} />}
+      {showModal && <WalkInModal onClose={() => setShowModal(false)} pin={pin} />}
     </div>
   )
 }
