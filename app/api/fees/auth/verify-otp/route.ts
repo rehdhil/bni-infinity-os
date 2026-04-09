@@ -12,10 +12,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { phone, otp } = body
-  if (typeof phone !== 'string' || typeof otp !== 'string') {
+  const { otp } = body
+  if (typeof body.phone !== 'string' || typeof otp !== 'string') {
     return NextResponse.json({ error: 'phone and otp required' }, { status: 400 })
   }
+  const digits = body.phone.replace(/\D/g, '').replace(/^91/, '')
+  if (digits.length !== 10) {
+    return NextResponse.json({ error: 'Invalid phone' }, { status: 400 })
+  }
+  const phone = `+91 ${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`
 
   const supabase = createServiceClient()
 

@@ -35,14 +35,19 @@ export default function PhoneForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Mobile Number</label>
-        <input
-          type="tel"
-          value={phone}
-          onChange={e => setPhone(e.target.value)}
-          placeholder="+91 98765 43210"
-          className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10"
-          required
-        />
+        <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden focus-within:border-red-600 focus-within:ring-2 focus-within:ring-red-600/10 bg-white">
+          <span className="px-3 py-3 text-gray-500 text-sm border-r border-gray-300 bg-gray-50 select-none">+91</span>
+          <input
+            type="tel"
+            value={phone}
+            onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+            placeholder="98765 43210"
+            maxLength={10}
+            inputMode="numeric"
+            className="flex-1 bg-white px-3 py-3 text-gray-900 placeholder-gray-400 focus:outline-none"
+            required
+          />
+        </div>
       </div>
       {error && <p className="text-red-600 text-sm">{error}</p>}
       <button
