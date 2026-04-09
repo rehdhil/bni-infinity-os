@@ -1,8 +1,13 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function ExportPage() {
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  useEffect(() => {
+    if (!sessionStorage.getItem('admin_auth')) router.push('/fees/admin')
+  }, [router])
 
   async function handleExport() {
     setLoading(true)

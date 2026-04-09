@@ -42,7 +42,10 @@ export async function GET(req: NextRequest) {
   const headers = Object.keys(rows[0])
   const csv = [
     headers.join(','),
-    ...rows.map(r => headers.map(h => `"${(r as Record<string, unknown>)[h] ?? ''}"`).join(',')),
+    ...rows.map(r => headers.map(h => {
+      const val = String((r as Record<string, unknown>)[h] ?? '')
+      return `"${val.replace(/"/g, '""')}"`
+    }).join(',')),
   ].join('\n')
 
   return new NextResponse(csv, {

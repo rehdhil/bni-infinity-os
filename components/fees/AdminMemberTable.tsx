@@ -34,13 +34,17 @@ export default function AdminMemberTable() {
     setPin(sessionStorage.getItem('admin_pin') || '')
   }, [])
 
-  function load(currentPin = pin) {
+  function load(currentPin: string) {
     setLoading(true)
     fetch(`/api/fees/admin/members?filter=${filter}`, {
       headers: { 'x-admin-pin': currentPin },
     })
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(r.status.toString())
+        return r.json()
+      })
       .then(setMembers)
+      .catch(() => setMembers([]))
       .finally(() => setLoading(false))
   }
 
@@ -55,7 +59,7 @@ export default function AdminMemberTable() {
       headers: { 'Content-Type': 'application/json', 'x-admin-pin': pin },
       body: JSON.stringify({ paymentId, action }),
     })
-    load()
+    load(pin)
   }
 
   return (

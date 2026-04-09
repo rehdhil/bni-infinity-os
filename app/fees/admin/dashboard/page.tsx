@@ -16,7 +16,8 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     const pin = sessionStorage.getItem('admin_pin') || ''
-    if (!sessionStorage.getItem('admin_auth')) { router.push('/fees/admin'); return }
+    const storedPin = sessionStorage.getItem('admin_pin')
+    if (!sessionStorage.getItem('admin_auth') || !storedPin) { router.push('/fees/admin'); return }
 
     fetch('/api/fees/admin/summary', {
       headers: { 'x-admin-pin': pin },
