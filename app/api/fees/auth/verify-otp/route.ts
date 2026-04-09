@@ -5,7 +5,7 @@ import { verifyOTP } from '@/lib/fees/otp'
 
 export async function POST(req: NextRequest) {
   if (!process.env.SESSION_SECRET) throw new Error('SESSION_SECRET is not set')
-  let body: { phone?: unknown; otp?: unknown }
+  let body: { email?: unknown; otp?: unknown }
   try {
     body = await req.json()
   } catch {
@@ -13,14 +13,10 @@ export async function POST(req: NextRequest) {
   }
 
   const { otp } = body
-  if (typeof body.phone !== 'string' || typeof otp !== 'string') {
-    return NextResponse.json({ error: 'phone and otp required' }, { status: 400 })
+  if (typeof body.email !== 'string' || typeof otp !== 'string') {
+    return NextResponse.json({ error: 'email and otp required' }, { status: 400 })
   }
-  const digits = body.phone.replace(/\D/g, '').replace(/^91/, '')
-  if (digits.length !== 10) {
-    return NextResponse.json({ error: 'Invalid phone' }, { status: 400 })
-  }
-  const phone = `+91 ${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`
+  const email = body.email.trim().toLowerCase()
 
   const supabase = createServiceClient()
 
@@ -28,7 +24,7 @@ export async function POST(req: NextRequest) {
   const { data: session } = await supabase
     .from('otp_sessions')
     .select('id, otp_hash')
-    .eq('phone', phone)
+    .eq('email', email)
     .eq('used', false)
     .gt('expires_at', new Date().toISOString())
     .order('created_at', { ascending: false })
@@ -56,7 +52,7 @@ export async function POST(req: NextRequest) {
   const { data: member } = await supabase
     .from('members')
     .select('id, name, phone')
-    .eq('phone', phone)
+    .eq('email', email)
     .single()
 
   if (!member) return NextResponse.json({ error: 'Member not found' }, { status: 404 })

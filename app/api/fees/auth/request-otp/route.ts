@@ -1,43 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { generateOTP, hashOTP } from '@/lib/fees/otp'
-import { sendWhatsAppOTP } from '@/lib/whatsapp'
+import { sendEmailOTP } from '@/lib/email-otp'
 
 export async function POST(req: NextRequest) {
-  let body: { phone?: unknown }
+  let body: { email?: unknown }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const rawPhone = body.phone
-  if (typeof rawPhone !== 'string') {
-    return NextResponse.json({ error: 'Invalid phone' }, { status: 400 })
+  const { email } = body
+  if (typeof email !== 'string' || !email.includes('@')) {
+    return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
   }
-  const digits = rawPhone.replace(/\D/g, '').replace(/^91/, '')
-  if (digits.length !== 10) {
-    return NextResponse.json({ error: 'Invalid phone' }, { status: 400 })
-  }
-  const phone = `+91 ${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`
+  const normalizedEmail = email.trim().toLowerCase()
 
   const supabase = createServiceClient()
 
   // Check member exists and is active
   const { data: member } = await supabase
     .from('members')
-    .select('id')
-    .eq('phone', phone)
+    .select('id, name')
+    .eq('email', normalizedEmail)
     .eq('status', 'active')
     .single()
 
-  if (!member) return NextResponse.json({ error: 'Phone not found' }, { status: 404 })
+  if (!member) return NextResponse.json({ error: 'Email not found' }, { status: 404 })
 
-  // Rate limit: max 3 OTPs per phone per minute
+  // Rate limit: max 3 OTPs per email per minute
   const { count } = await supabase
     .from('otp_sessions')
     .select('*', { count: 'exact', head: true })
-    .eq('phone', phone)
+    .eq('email', normalizedEmail)
     .gt('created_at', new Date(Date.now() - 60_000).toISOString())
 
   if ((count ?? 0) >= 3) {
@@ -50,7 +46,7 @@ export async function POST(req: NextRequest) {
 
   const { data: inserted, error: insertError } = await supabase
     .from('otp_sessions')
-    .insert({ phone, otp_hash, expires_at })
+    .insert({ email: normalizedEmail, otp_hash, expires_at })
     .select('id')
     .single()
 
@@ -59,10 +55,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    await sendWhatsAppOTP(phone, otp)
+    await sendEmailOTP(normalizedEmail, member.name, otp)
   } catch (err) {
     await supabase.from('otp_sessions').delete().eq('id', inserted.id)
-    console.error('WhatsApp OTP send failed:', err)
+    console.error('Email OTP send failed:', err)
     return NextResponse.json({ error: 'Failed to send OTP' }, { status: 502 })
   }
 

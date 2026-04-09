@@ -4,15 +4,15 @@ import { useRouter } from 'next/navigation'
 
 export default function OTPForm() {
   const [otp, setOtp] = useState('')
-  const [phone, setPhone] = useState<string | null>(null)
+  const [email, setEmail] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
 
   useEffect(() => {
-    const p = sessionStorage.getItem('bni_phone')
-    if (!p) router.push('/fees')
-    else setPhone(p)
+    const e = sessionStorage.getItem('bni_email')
+    if (!e) router.push('/fees')
+    else setEmail(e)
   }, [router])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -23,7 +23,7 @@ export default function OTPForm() {
     const res = await fetch('/api/fees/auth/verify-otp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone, otp }),
+      body: JSON.stringify({ email, otp }),
     })
 
     const data = await res.json()
@@ -37,12 +37,12 @@ export default function OTPForm() {
     router.push('/fees/dashboard')
   }
 
-  if (phone === null) return null
+  if (email === null) return null
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <p className="text-gray-500 text-sm text-center">
-        OTP sent to <span className="text-gray-900 font-medium">{phone}</span> via WhatsApp
+        OTP sent to <span className="text-gray-900 font-medium">{email}</span>
       </p>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1.5">Enter OTP</label>

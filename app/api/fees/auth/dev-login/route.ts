@@ -8,14 +8,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Not available' }, { status: 404 })
   }
 
-  const { phone } = await req.json()
-  if (!phone) return NextResponse.json({ error: 'phone required' }, { status: 400 })
+  const { email } = await req.json()
+  if (!email) return NextResponse.json({ error: 'email required' }, { status: 400 })
 
   const supabase = createServiceClient()
   const { data: member } = await supabase
     .from('members')
     .select('id, name, phone')
-    .eq('phone', phone)
+    .eq('email', email.trim().toLowerCase())
     .single()
 
   if (!member) return NextResponse.json({ error: 'Member not found' }, { status: 404 })
