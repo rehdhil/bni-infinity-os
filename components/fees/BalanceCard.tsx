@@ -21,9 +21,9 @@ interface BalanceData {
 
 const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const STATUS_COLORS: Record<string, string> = {
-  verified: 'text-green-400',
-  pending_verification: 'text-yellow-400',
-  rejected: 'text-red-400',
+  verified: 'text-green-600',
+  pending_verification: 'text-amber-600',
+  rejected: 'text-red-600',
 }
 
 export default function BalanceCard() {
@@ -43,13 +43,13 @@ export default function BalanceCard() {
       .finally(() => setLoading(false))
   }, [router])
 
-  if (loading) return <div className="text-center text-gray-500 py-10">Loading…</div>
+  if (loading) return <div className="text-center text-gray-400 py-10">Loading…</div>
   if (fetchError) return (
     <div className="text-center py-10 space-y-3">
-      <p className="text-red-400">Failed to load balance. Please try again.</p>
+      <p className="text-red-600 text-sm">Failed to load balance. Please try again.</p>
       <button
         onClick={() => { setFetchError(false); window.location.reload() }}
-        className="text-blue-400 text-sm"
+        className="text-red-600 text-sm font-medium hover:text-red-700"
       >
         Retry
       </button>
@@ -59,9 +59,9 @@ export default function BalanceCard() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800">
-        <p className="text-gray-400 text-sm">Hi, {data.name}</p>
-        <p className="text-4xl font-bold mt-1">₹{data.totalDue.toLocaleString('en-IN')}</p>
+      <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+        <p className="text-gray-500 text-sm">Hi, {data.name}</p>
+        <p className="text-4xl font-bold mt-1 text-gray-900">₹{data.totalDue.toLocaleString('en-IN')}</p>
         <p className="text-gray-400 text-sm mt-1">Total amount due</p>
 
         {data.totalDue > 0 && (
@@ -76,33 +76,33 @@ export default function BalanceCard() {
         )}
 
         {data.totalDue === 0 && (
-          <p className="mt-3 text-green-400 text-sm font-medium">All payments up to date ✓</p>
+          <p className="mt-3 text-green-600 text-sm font-medium">All payments up to date ✓</p>
         )}
       </div>
 
       {data.totalDue > 0 && (
         <button
           onClick={() => router.push('/fees/pay')}
-          className="w-full bg-blue-600 hover:bg-blue-700 rounded-xl py-3 font-semibold transition-colors"
+          className="w-full bg-red-600 hover:bg-red-700 rounded-xl py-3 font-semibold text-white transition-colors"
         >
           Pay Now
         </button>
       )}
 
       {data.history.length > 0 && (
-        <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800">
-          <p className="text-sm font-medium text-gray-300 mb-3">Payment History</p>
+        <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+          <p className="text-sm font-semibold text-gray-700 mb-3">Payment History</p>
           <div className="space-y-3">
             {data.history.map(h => (
               <div key={h.id} className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm text-white">
+                  <p className="text-sm text-gray-900">
                     {MONTH_NAMES[h.period_month - 1]} {h.period_year}
                   </p>
-                  <p className="text-xs text-gray-500">{h.method}</p>
+                  <p className="text-xs text-gray-400">{h.method}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium">₹{h.amount.toLocaleString('en-IN')}</p>
+                  <p className="text-sm font-medium text-gray-900">₹{h.amount.toLocaleString('en-IN')}</p>
                   <p className={`text-xs ${STATUS_COLORS[h.status] || 'text-gray-400'}`}>
                     {h.status.replace(/_/g, ' ')}
                   </p>

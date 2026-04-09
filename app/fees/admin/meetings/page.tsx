@@ -27,16 +27,16 @@ export default function MeetingsPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Collection Windows</h2>
+      <h2 className="text-lg font-semibold text-gray-900">Collection Windows</h2>
       {meetings.map(m => (
-        <div key={m.id} className="bg-gray-900 rounded-2xl p-4 border border-gray-800 flex justify-between items-center">
+        <div key={m.id} className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm flex justify-between items-center">
           <div>
-            <p className="font-medium">{new Date(m.meeting_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-            <p className="text-xs text-gray-500 capitalize">{m.type}</p>
+            <p className="font-medium text-gray-900">{new Date(m.meeting_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+            <p className="text-xs text-gray-400 capitalize">{m.type}</p>
           </div>
           <button onClick={() => toggleCollection(m.id, m.collection_open)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium ${
-              m.collection_open ? 'bg-green-700 text-white' : 'bg-gray-800 text-gray-400'
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+              m.collection_open ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
             }`}>
             {m.collection_open ? 'Open' : 'Closed'}
           </button>

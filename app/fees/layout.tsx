@@ -1,10 +1,19 @@
+import Image from 'next/image'
+
 export default function FeesLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-white">BNI Infinity</h1>
-          <p className="text-gray-400 text-sm mt-1">Chapter Fee Portal</p>
+          <Image
+            src="/BNI Logo.png"
+            alt="BNI Infinity"
+            width={120}
+            height={60}
+            className="mx-auto mb-2 object-contain"
+            priority
+          />
+          <p className="text-gray-400 text-sm">Chapter Fee Portal</p>
         </div>
         {children}
       </div>

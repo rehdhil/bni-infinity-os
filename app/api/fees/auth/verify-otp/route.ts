@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
   res.cookies.set('bni_session', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    path: '/fees',
+    path: '/',
     maxAge: 60 * 60 * 24 * 7,
     sameSite: 'lax',
   })

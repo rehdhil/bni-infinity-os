@@ -41,11 +41,11 @@ export default function OTPForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <p className="text-gray-400 text-sm text-center">
-        OTP sent to <span className="text-white">{phone}</span> via WhatsApp
+      <p className="text-gray-500 text-sm text-center">
+        OTP sent to <span className="text-gray-900 font-medium">{phone}</span> via WhatsApp
       </p>
       <div>
-        <label className="block text-sm text-gray-400 mb-2">Enter OTP</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">Enter OTP</label>
         <input
           type="text"
           inputMode="numeric"
@@ -53,22 +53,22 @@ export default function OTPForm() {
           value={otp}
           onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
           placeholder="123456"
-          className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white text-center text-2xl tracking-widest placeholder-gray-600 focus:outline-none focus:border-blue-500"
+          className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 text-center text-2xl tracking-widest placeholder-gray-400 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10"
           required
         />
       </div>
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
       <button
         type="submit"
         disabled={loading || otp.length !== 6}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-xl py-3 font-semibold transition-colors"
+        className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl py-3 font-semibold text-white transition-colors"
       >
         {loading ? 'Verifying…' : 'Verify OTP'}
       </button>
       <button
         type="button"
         onClick={() => router.push('/fees')}
-        className="w-full text-gray-500 text-sm hover:text-gray-300"
+        className="w-full text-gray-400 text-sm hover:text-gray-600 transition-colors"
       >
         Back
       </button>

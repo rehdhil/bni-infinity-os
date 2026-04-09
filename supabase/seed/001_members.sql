@@ -63,8 +63,7 @@ INSERT INTO members (name, phone, category, company, power_team, join_date, stat
   ('REIZON GEO REJI',          '+91 9747 248 500', 'Industrial Automation',                 'Steel City Industries',                        'Projects',     '2025-03-05', 'active'),
   ('A M FAHIM RIYAZ',          '+91 9249 457 575', 'Roofing & Gutters',                     'AM Mohammed Usman & Brother',                  'Construction', '2017-10-25', 'active'),
   ('BENJAMIN ROY',             '+91 9995 199 273', 'Windows & Doors',                       'Hekur Contractors Pvt Ltd',                    'Construction', '2017-12-27', 'active'),
-  -- NOTE: Nabeela Sait's phone in CSV (+91 9447 221 899) is a duplicate of Jayan K — verify and update
-  ('NABEELA SAIT',             '+91 0000 000 000', 'Public Address Systems',                'Mecotronics Ernakulam',                         'HNI',          '2017-11-01', 'active'),
+  ('NABEELA SAIT',             '+91 9746 422 244', 'Public Address Systems',                'Mecotronics Ernakulam',                         'HNI',          '2017-11-01', 'active'),
   ('ARUN SASI',                '+91 9447 956 973', 'Consulting',                            'Neowave HR Consultants',                       'SME',          '2022-04-06', 'active'),
   ('GEORGE SEBASTIAN',         '+91 8714 422 664', 'Uniforms',                              'JB Creations',                                 'SME',          '2024-02-21', 'active'),
   ('MARIA SHAJI',              '+91 9562 442 789', 'Gifts',                                 'Hamperbells',                                  'Marketing',    '2023-11-29', 'active'),

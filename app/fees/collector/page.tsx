@@ -24,13 +24,13 @@ export default function CollectorPINPage() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-lg font-semibold">Collector Access</h2>
+      <h2 className="text-lg font-semibold text-gray-900">Collector Access</h2>
       <input type="password" value={pin} onChange={e => setPin(e.target.value)}
         placeholder="Enter PIN" maxLength={6}
-        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white text-center text-2xl tracking-widest focus:outline-none focus:border-blue-500" />
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+        className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-gray-900 text-center text-2xl tracking-widest focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/10" />
+      {error && <p className="text-red-600 text-sm">{error}</p>}
       <button type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 rounded-xl py-3 font-semibold">
+        className="w-full bg-red-600 hover:bg-red-700 rounded-xl py-3 font-semibold text-white transition-colors">
         Enter
       </button>
     </form>

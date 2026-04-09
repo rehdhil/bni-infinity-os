@@ -28,10 +28,10 @@ export default function ExportPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Export Payments</h2>
-      <p className="text-gray-400 text-sm">Download complete payment records as CSV.</p>
+      <h2 className="text-lg font-semibold text-gray-900">Export Payments</h2>
+      <p className="text-gray-500 text-sm">Download complete payment records as CSV.</p>
       <button onClick={handleExport} disabled={loading}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-xl py-3 font-semibold">
+        className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl py-3 font-semibold text-white transition-colors">
         {loading ? 'Preparing…' : 'Download CSV'}
       </button>
     </div>

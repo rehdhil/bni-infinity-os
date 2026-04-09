@@ -29,33 +29,33 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Chapter Fees</h2>
+      <h2 className="text-lg font-semibold text-gray-900">Chapter Fees</h2>
       {summary && (
         <div className="grid grid-cols-2 gap-3">
           {[
-            { label: 'Collected', value: `₹${summary.totalCollected.toLocaleString('en-IN')}`, color: 'text-green-400' },
-            { label: 'Pending Verify', value: summary.pendingVerification, color: 'text-yellow-400' },
-            { label: 'Cash Count', value: summary.cashPending, color: 'text-orange-400' },
-            { label: 'Active Members', value: summary.totalMembers, color: 'text-white' },
+            { label: 'Collected', value: `₹${summary.totalCollected.toLocaleString('en-IN')}`, color: 'text-green-600' },
+            { label: 'Pending Verify', value: summary.pendingVerification, color: 'text-amber-600' },
+            { label: 'Cash Count', value: summary.cashPending, color: 'text-orange-600' },
+            { label: 'Active Members', value: summary.totalMembers, color: 'text-gray-900' },
           ].map(s => (
-            <div key={s.label} className="bg-gray-900 rounded-2xl p-4 border border-gray-800">
+            <div key={s.label} className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
               <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-              <p className="text-xs text-gray-500 mt-1">{s.label}</p>
+              <p className="text-xs text-gray-400 mt-1">{s.label}</p>
             </div>
           ))}
         </div>
       )}
       <div className="space-y-2">
         <Link href="/fees/admin/members"
-          className="block w-full bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl px-4 py-3 text-sm">
+          className="block w-full bg-white hover:bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 font-medium shadow-sm transition-colors">
           Member Payment Table →
         </Link>
         <Link href="/fees/admin/meetings"
-          className="block w-full bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl px-4 py-3 text-sm">
+          className="block w-full bg-white hover:bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 font-medium shadow-sm transition-colors">
           Meeting Collection Windows →
         </Link>
         <Link href="/fees/admin/export"
-          className="block w-full bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-xl px-4 py-3 text-sm">
+          className="block w-full bg-white hover:bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 font-medium shadow-sm transition-colors">
           Export CSV →
         </Link>
       </div>
