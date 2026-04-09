@@ -55,7 +55,7 @@ CREATE TABLE payments (
   id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   member_id        uuid NOT NULL REFERENCES members(id) ON DELETE RESTRICT,
   amount           int NOT NULL,
-  method           text NOT NULL CHECK (method IN ('UPI', 'Cash', 'CC')),
+  method           text NOT NULL CHECK (method IN ('UPI', 'Cash', 'CC', 'Barter')),
   transaction_ref  text,
   proof_url        text,
   period_month     int NOT NULL CHECK (period_month BETWEEN 1 AND 12),
