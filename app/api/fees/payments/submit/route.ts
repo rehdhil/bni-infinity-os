@@ -53,7 +53,16 @@ export async function POST(req: NextRequest) {
   let proofUrl: string | null = null
 
   if (proofFile) {
-    const ext = proofFile.name.split('.').pop()
+    const MIME_TO_EXT: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'application/pdf': 'pdf',
+    }
+    const ext = MIME_TO_EXT[proofFile.type]
+    if (!ext) {
+      return NextResponse.json({ error: 'Invalid file type' }, { status: 400 })
+    }
     const path = `${session.memberId}/${now.getFullYear()}-${now.getMonth() + 1}-${Date.now()}.${ext}`
     const { error: uploadError } = await supabase.storage
       .from('payment-proofs')

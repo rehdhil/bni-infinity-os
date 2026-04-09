@@ -15,9 +15,15 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = createServiceClient()
-  await supabase.from('payments')
+  const { data: updated, error: updateError } = await supabase.from('payments')
     .update({ status: action as string, notes: typeof notes === 'string' ? notes : null })
     .eq('id', paymentId)
+    .select('id')
+    .single()
+
+  if (updateError || !updated) {
+    return NextResponse.json({ error: 'Payment not found or update failed' }, { status: 404 })
+  }
 
   return NextResponse.json({ ok: true })
 }
