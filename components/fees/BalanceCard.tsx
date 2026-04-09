@@ -29,6 +29,7 @@ const STATUS_COLORS: Record<string, string> = {
 export default function BalanceCard() {
   const [data, setData] = useState<BalanceData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -37,11 +38,23 @@ export default function BalanceCard() {
       .then(setData)
       .catch(err => {
         if (err === 401) router.push('/fees')
+        else setFetchError(true)
       })
       .finally(() => setLoading(false))
   }, [router])
 
   if (loading) return <div className="text-center text-gray-500 py-10">Loading…</div>
+  if (fetchError) return (
+    <div className="text-center py-10 space-y-3">
+      <p className="text-red-400">Failed to load balance. Please try again.</p>
+      <button
+        onClick={() => { setFetchError(false); window.location.reload() }}
+        className="text-blue-400 text-sm"
+      >
+        Retry
+      </button>
+    </div>
+  )
   if (!data) return null
 
   return (

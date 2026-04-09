@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 
 export default function OTPForm() {
   const [otp, setOtp] = useState('')
-  const [phone, setPhone] = useState('')
+  const [phone, setPhone] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
@@ -36,6 +36,8 @@ export default function OTPForm() {
 
     router.push('/fees/dashboard')
   }
+
+  if (phone === null) return null
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

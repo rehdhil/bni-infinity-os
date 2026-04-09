@@ -4,6 +4,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { verifyOTP } from '@/lib/fees/otp'
 
 export async function POST(req: NextRequest) {
+  if (!process.env.SESSION_SECRET) throw new Error('SESSION_SECRET is not set')
   let body: { phone?: unknown; otp?: unknown }
   try {
     body = await req.json()
@@ -60,6 +61,8 @@ export async function POST(req: NextRequest) {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
+    .setAudience('bni-infinity')
+    .setIssuer('bni-infinity')
     .sign(secret)
 
   const res = NextResponse.json({ ok: true, name: member.name })

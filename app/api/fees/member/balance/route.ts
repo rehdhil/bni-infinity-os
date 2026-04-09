@@ -42,7 +42,7 @@ export async function GET(_req: NextRequest) {
   })
 
   const totalDue = calculateBalance({
-    unpaidMeetings: balanceRow.has_term_plan ? 0 : unpaidMeetings.length,
+    unpaidMeetings: unpaidMeetings.length,
     unpaidFees: balanceRow.unpaid_fees,
     hasTermPlan: balanceRow.has_term_plan,
     monthlyRate: 2500,
