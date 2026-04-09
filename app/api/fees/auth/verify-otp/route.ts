@@ -35,14 +35,14 @@ export async function POST(req: NextRequest) {
   if (!valid) return NextResponse.json({ error: 'Invalid OTP' }, { status: 401 })
 
   // Atomically mark session used — guard prevents replay
-  const { count } = await supabase
+  const { data: updated } = await supabase
     .from('otp_sessions')
     .update({ used: true })
     .eq('id', session.id)
     .eq('used', false)
-    .select('*', { count: 'exact', head: true })
+    .select('id')
 
-  if ((count ?? 0) === 0) {
+  if (!updated || updated.length === 0) {
     return NextResponse.json({ error: 'OTP already used' }, { status: 401 })
   }
 
