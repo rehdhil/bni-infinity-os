@@ -2,7 +2,7 @@ export async function sendWhatsAppOTP(phone: string, otp: string): Promise<void>
   const phoneId = process.env.WHATSAPP_PHONE_ID!
   const token = process.env.WHATSAPP_TOKEN!
 
-  // Normalise phone: strip spaces, ensure +91 prefix
+  // Normalise phone: strip spaces (phone is stored as '+91 XXXX XXX XXX' in DB)
   const to = phone.replace(/\s/g, '')
 
   const res = await fetch(
