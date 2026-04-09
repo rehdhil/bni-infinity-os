@@ -1,0 +1,11 @@
+-- Storage bucket for payment proofs
+-- Note: Run this after creating the bucket manually in Supabase dashboard
+-- This documents the RLS policy for the bucket
+
+-- Allow authenticated service role to upload
+-- (enforced via service role key in API routes, not RLS)
+-- Bucket settings:
+--   Name: payment-proofs
+--   Public: false
+--   File size limit: 5MB
+--   Allowed MIME types: image/jpeg, image/png, image/webp, application/pdf
