@@ -1,0 +1,75 @@
+{
+  "name": "BNI Fees — Meeting Day Cash List",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 7 1 4,5,6,7,8,9 *" }] }
+      }
+    },
+    {
+      "id": "getCashList",
+      "name": "Get Cash List",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.APP_URL }}/api/fees/collector/list",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-collector-pin", "value": "={{ $env.COLLECTOR_PIN }}" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "formatList",
+      "name": "Format List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300],
+      "parameters": {
+        "jsCode": "const members = $input.item.json;\nif (!members.length) return [{ json: { text: 'All members have paid digitally. No cash collection needed today.' } }];\nconst list = members.map((m, i) => `${i+1}. ${m.name} (${m.power_team})`).join('\\n');\nreturn [{ json: { text: `BNI Infinity — Cash Collection List\\n\\n${list}\\n\\nTotal: ${members.length} members\\n\\nCollect at the door today.` } }];"
+      }
+    },
+    {
+      "id": "sendToCollector",
+      "name": "Send to Collector",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.WHATSAPP_PHONE_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{ $env.WHATSAPP_TOKEN }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={\"messaging_product\":\"whatsapp\",\"to\":\"{{ $env.COLLECTOR_PHONE }}\",\"type\":\"text\",\"text\":{\"body\":\"{{ $json.text }}\"}}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": { "main": [[{ "node": "Get Cash List", "type": "main", "index": 0 }]] },
+    "Get Cash List": { "main": [[{ "node": "Format List", "type": "main", "index": 0 }]] },
+    "Format List": { "main": [[{ "node": "Send to Collector", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

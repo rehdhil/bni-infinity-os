@@ -1,0 +1,76 @@
+{
+  "name": "BNI Fees — Payment Confirmation",
+  "nodes": [
+    {
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "parameters": {
+        "path": "fees-confirmation",
+        "httpMethod": "POST",
+        "responseMode": "onReceived",
+        "responseData": "noData"
+      },
+      "webhookId": "fees-confirmation"
+    },
+    {
+      "id": "verifySecret",
+      "name": "Verify Secret",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "id": "secret-check",
+              "leftValue": "={{ $json.headers['x-webhook-secret'] }}",
+              "rightValue": "={{ $env.N8N_WEBHOOK_SECRET }}",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "sendConfirmation",
+      "name": "Send WhatsApp Confirmation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 220],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.WHATSAPP_PHONE_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{ $env.WHATSAPP_TOKEN }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={\"messaging_product\":\"whatsapp\",\"to\":\"{{ $json.body.phone.replace(/\\\\s/g,'') }}\",\"type\":\"text\",\"text\":{\"body\":\"Hi {{ $json.body.memberName }}, we received your BNI Infinity fee payment of \\u20b9{{ $json.body.amount }} via {{ $json.body.method }}. The ST will verify and confirm shortly.\\n\\n— BNI Infinity\"}}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Verify Secret", "type": "main", "index": 0 }]] },
+    "Verify Secret": {
+      "main": [
+        [{ "node": "Send WhatsApp Confirmation", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}

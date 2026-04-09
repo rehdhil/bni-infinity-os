@@ -95,5 +95,23 @@ export async function POST(req: NextRequest) {
     })
   }
 
+  // Fire-and-forget N8N confirmation webhook
+  if (process.env.N8N_WEBHOOK_CONFIRMATION_URL) {
+    fetch(process.env.N8N_WEBHOOK_CONFIRMATION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-webhook-secret': process.env.N8N_WEBHOOK_SECRET ?? '',
+      },
+      body: JSON.stringify({
+        memberName: session.name,
+        phone: session.phone,
+        amount,
+        method,
+        paymentId: payment.id,
+      }),
+    }).catch(() => {}) // fire-and-forget — never block the response
+  }
+
   return NextResponse.json({ ok: true, paymentId: payment.id, is6Month })
 }

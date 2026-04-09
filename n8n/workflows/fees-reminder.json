@@ -1,0 +1,85 @@
+{
+  "name": "BNI Fees — Pre-Meeting Reminder (D-2)",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "parameters": {
+        "rule": { "interval": [{ "field": "cronExpression", "expression": "0 9 * * *" }] }
+      }
+    },
+    {
+      "id": "checkDate",
+      "name": "Check D-2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "parameters": {
+        "jsCode": "const today = new Date();\nconst res = await $http.get({\n  url: `${$env.SUPABASE_URL}/rest/v1/meeting_sessions?type=eq.offline&meeting_date=gte.${today.toISOString().slice(0,10)}&order=meeting_date.asc&limit=1`,\n  headers: { apikey: $env.SUPABASE_ANON_KEY, Authorization: `Bearer ${$env.SUPABASE_ANON_KEY}` }\n});\nconst nextMeeting = res.body[0];\nif (!nextMeeting) return [];\nconst meetingDate = new Date(nextMeeting.meeting_date);\nconst diffDays = Math.round((meetingDate - today) / (1000 * 60 * 60 * 24));\nif (diffDays !== 2) return [];\nreturn [{ json: { meetingDate: nextMeeting.meeting_date } }];"
+      }
+    },
+    {
+      "id": "getUnpaid",
+      "name": "Get Unpaid Members",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/member_balance?has_term_plan=eq.false&status=eq.active",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_ANON_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_ANON_KEY }}" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "splitMembers",
+      "name": "Split Members",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [900, 300],
+      "parameters": { "batchSize": 1 }
+    },
+    {
+      "id": "sendWA",
+      "name": "Send WhatsApp Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v20.0/{{ $env.WHATSAPP_PHONE_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{ $env.WHATSAPP_TOKEN }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={\"messaging_product\":\"whatsapp\",\"to\":\"{{ $json.phone.replace(/\\\\s/g,'') }}\",\"type\":\"text\",\"text\":{\"body\":\"Hi {{ $json.name }}, your BNI Infinity meeting fee of \\u20b92,500 is due for the meeting on {{ $('Check D-2').item.json.meetingDate }}.\\n\\nPay here: https://infinity.tetherlo.com/fees\\n\\n— BNI Infinity ST\"}}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": { "main": [[{ "node": "Check D-2", "type": "main", "index": 0 }]] },
+    "Check D-2": { "main": [[{ "node": "Get Unpaid Members", "type": "main", "index": 0 }]] },
+    "Get Unpaid Members": { "main": [[{ "node": "Split Members", "type": "main", "index": 0 }]] },
+    "Split Members": { "main": [[{ "node": "Send WhatsApp Reminder", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
